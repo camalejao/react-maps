@@ -4,14 +4,18 @@ import Demo from './geolocator.js'
 import Navbar from './navbar/navbar.js'
 import firebase from 'firebase';
 import icon from './icon.png';
+import marker from './marker.css';
 
-const AnyReactComponent = ({nome}) => <div><img src={icon} width= '30px' height='40px'/></div>;
+const AnyReactComponent = ({ nome }) => <div><img src={icon} width='35px' height='40px' className="marker" title={nome} /></div>;
 export default class Mapa extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { lat: '', lon: '', carregado: false, status: null, marcadores: [],
-        categorias: [] };
+
+        this.state = {
+            lat: '', lon: '', carregado: false, status: null, marcadores: [],
+            categorias: []
+        };
     }
 
     componentDidMount() {
@@ -19,14 +23,15 @@ export default class Mapa extends Component {
             .then(res => res.json())
             .then(
                 (result) => {
+                    console.log(result);
                     this.setState({
                         carregado: true,
-                        //lat: result.lat,
-                        //lon: result.lon
-                        lat:-9.6640396,
-                        lon:-35.7303309
+                        lat: result.lat,
+                        lon: result.lon
+                        //lat:-9.6640396,
+                        //lon:-35.7303309
                     });
-                    
+
                 },
                 (error) => {
                     this.setState({
@@ -35,25 +40,23 @@ export default class Mapa extends Component {
                     });
                 }
             )
-            const db = firebase.firestore();
+        const db = firebase.firestore();
         db.collection('marcadores').get().then((querySnapshot) => {
             const marcadores = [];
             querySnapshot.forEach((doc) => {
-                    // doc.data() is never undefined for query doc snapshots
-                    console.log(doc.id, " => ", doc.data());
+                // doc.data() is never undefined for query doc snapshots
+                console.log(doc.id, " => ", doc.data());
 
-                    const {categoria, coords, nome, descricao} = doc.data();
+                const { categoria, coords, nome, descricao } = doc.data();
 
-                    marcadores.push({
-                        key: doc.id,
-                        categoria: categoria,
-                        coords: coords,
-                        nome: nome,
-                        descricao: descricao,
-                    });
-
-
-                }
+                marcadores.push({
+                    key: doc.id,
+                    categoria: categoria,
+                    coords: coords,
+                    nome: nome,
+                    descricao: descricao,
+                });
+            }
             );
 
             this.setState({
@@ -66,18 +69,18 @@ export default class Mapa extends Component {
         db.collection('categoria').get().then((querySnapshot) => {
             const categorias = [];
             querySnapshot.forEach((doc) => {
-                    // doc.data() is never undefined for query doc snapshots
-                    console.log(doc.id, " => ", doc.data());
+                // doc.data() is never undefined for query doc snapshots
+                console.log(doc.id, " => ", doc.data());
 
-                    const {nome} = doc.data();
+                const { nome } = doc.data();
 
-                    categorias.push({
-                        key: doc.id,
-                        nome: nome,
-                    });
+                categorias.push({
+                    key: doc.id,
+                    nome: nome,
+                });
 
 
-                }
+            }
             );
 
             this.setState({
@@ -95,46 +98,48 @@ export default class Mapa extends Component {
         }
 
         if (this.state.carregado) {
-            var latitude = this.state.lat;
-            var longitude = this.state.lon;
+            const latitude = this.state.lat;
+            const longitude = this.state.lon;
             var center = { lat: latitude, lng: longitude };
-            var zoom = 11;
+            var zoom = 12;
             console.log(this.state);
             return (
-                
-
-
                 <div className='google-map' style={style}>
                     <Navbar />
                     <li className="buttom">
-                            <a className="button-link" href="/map">Mapa</a>
-                        </li>
-                    <Demo />
-                    <h1>
-                        HOME {latitude}, {longitude}
-                    </h1>
+                        <a className="button-link" href="/map">Mapa</a>
+                    </li>
+                    
+                    <h6>
+                        local atual: {latitude}, {longitude}
+                    </h6>
                     <GoogleMapReact
                         bootstrapURLKeys={{ key: '' }}
                         defaultCenter={center}
                         defaultZoom={zoom}
                     >
-                        {this.state.marcadores.map((marcadores) => {
-                        return (
-                            <AnyReactComponent
-                                lat={marcadores.coords.lat}
-                                lng={marcadores.coords.long}
-                                nome={marcadores.nome}
-                                onChildClick={marcadores.descricao}
-                                hover={marcadores.desc}
-                            />
-                        )
-                    })}
+                        <AnyReactComponent
+                            lat={latitude}
+                            lng={longitude}
+                            nome={'Sua Localização'}
+                        />
+                        {this.state.marcadores.map((marcador) => {
+                            return (
+                                <AnyReactComponent
+                                    lat={marcador.coords.lat}
+                                    lng={marcador.coords.long}
+                                    nome={marcador.nome}
+                                    onChildClick={marcador.descricao}
+                                    hover={marcador.desc}
+                                />
+                            )
+                        })}
                     </GoogleMapReact>
                 </div>
             );
         }
         else
-            return <div>eh</div>
+            return <div>Carregando</div>
     }
 }
 
