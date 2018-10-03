@@ -2,15 +2,16 @@ import React, { Component } from 'react';
 import GoogleMapReact from 'google-map-react';
 import Demo from './geolocator.js'
 import Navbar from './navbar/navbar.js'
+import firebase from 'firebase';
+import icon from './icon.png';
 
-const AnyReactComponent = ({ text }) => <div>{text}</div>;
-
-class Mapa extends Component {
-
+const AnyReactComponent = ({nome}) => <div><img src={icon} width= '30px' height='40px'/></div>;
+export default class Mapa extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { lat: '', lon: '', carregado: false, status: null };
+        this.state = { lat: '', lon: '', carregado: false, status: null, marcadores: [],
+        categorias: [] };
     }
 
     componentDidMount() {
@@ -20,17 +21,71 @@ class Mapa extends Component {
                 (result) => {
                     this.setState({
                         carregado: true,
-                        lat: result.lat,
-                        lon: result.lon
+                        //lat: result.lat,
+                        //lon: result.lon
+                        lat:-9.6640396,
+                        lon:-35.7303309
                     });
+                    
                 },
                 (error) => {
                     this.setState({
-                        carregado: true,
+                        carregado: false,
                         status: error
                     });
                 }
             )
+            const db = firebase.firestore();
+        db.collection('marcadores').get().then((querySnapshot) => {
+            const marcadores = [];
+            querySnapshot.forEach((doc) => {
+                    // doc.data() is never undefined for query doc snapshots
+                    console.log(doc.id, " => ", doc.data());
+
+                    const {categoria, coords, nome, descricao} = doc.data();
+
+                    marcadores.push({
+                        key: doc.id,
+                        categoria: categoria,
+                        coords: coords,
+                        nome: nome,
+                        descricao: descricao,
+                    });
+
+
+                }
+            );
+
+            this.setState({
+                marcadores: marcadores,
+            });
+        }).catch((error) => {
+            console.error(error);
+        });
+
+        db.collection('categoria').get().then((querySnapshot) => {
+            const categorias = [];
+            querySnapshot.forEach((doc) => {
+                    // doc.data() is never undefined for query doc snapshots
+                    console.log(doc.id, " => ", doc.data());
+
+                    const {nome} = doc.data();
+
+                    categorias.push({
+                        key: doc.id,
+                        nome: nome,
+                    });
+
+
+                }
+            );
+
+            this.setState({
+                categorias: categorias,
+            });
+        }).catch((error) => {
+            console.error(error);
+        });
     }
 
     render() {
@@ -46,7 +101,7 @@ class Mapa extends Component {
             var zoom = 11;
             console.log(this.state);
             return (
-
+                
 
 
                 <div className='google-map' style={style}>
@@ -63,11 +118,17 @@ class Mapa extends Component {
                         defaultCenter={center}
                         defaultZoom={zoom}
                     >
-                        <AnyReactComponent
-                            lat={latitude}
-                            lng={longitude}
-                            text={'Você está aqui'}
-                        />
+                        {this.state.marcadores.map((marcadores) => {
+                        return (
+                            <AnyReactComponent
+                                lat={marcadores.coords.lat}
+                                lng={marcadores.coords.long}
+                                nome={marcadores.nome}
+                                onChildClick={marcadores.descricao}
+                                hover={marcadores.desc}
+                            />
+                        )
+                    })}
                     </GoogleMapReact>
                 </div>
             );
@@ -77,4 +138,4 @@ class Mapa extends Component {
     }
 }
 
-export default Mapa;
+
