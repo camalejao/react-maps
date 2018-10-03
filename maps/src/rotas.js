@@ -8,15 +8,7 @@ import Geolocator from './components/geolocator';
 import firebase from 'firebase';
 
  // Initialize Firebase
-  var config = {
-    apiKey: "AIzaSyCqjs5Wyr1Aw5jJ-YQFcnwBrcIEYP6cANc",
-    authDomain: "react-map-82b1e.firebaseapp.com",
-    databaseURL: "https://react-map-82b1e.firebaseio.com/",
-    projectId: "react-map-82b1e",
-    storageBucket: "react-map-82b1e.appspot.com",
-    messagingSenderId: "1021384083333"
-  };
-  firebase.initializeApp(config);
+
 
 
 
