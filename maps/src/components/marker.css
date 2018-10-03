@@ -2,6 +2,10 @@
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 30px;
+  height: 30px;
+  background-color: #ff6600;
+  border: 2px solid #fff;
   border-radius: 100%;
   user-select: none;
   transform: translate(-50%, -50%);

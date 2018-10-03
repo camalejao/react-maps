@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import GoogleMapReact from 'google-map-react';
-import Demo from './geolocator.js'
+import geolocated from './geolocator.js'
 import Navbar from './navbar/navbar.js'
 import firebase from 'firebase';
 import icon from './icon.png';
 import marker from './marker.css';
 
-const AnyReactComponent = ({ nome }) => <div><img src={icon} width='35px' height='40px' className="marker" title={nome} /></div>;
+const AnyReactComponent = ({ nome }) => <div><img src={icon} className="marker" title={nome} /></div>;
 export default class Mapa extends Component {
 
     constructor(props) {
@@ -103,38 +103,48 @@ export default class Mapa extends Component {
             var center = { lat: latitude, lng: longitude };
             var zoom = 12;
             console.log(this.state);
+            console.log(geolocated.geoPropTypes.coords);
             return (
-                <div className='google-map' style={style}>
+
+                <div className>
                     <Navbar />
-                    <li className="buttom">
-                        <a className="button-link" href="/map">Mapa</a>
-                    </li>
-                    
-                    <h6>
-                        local atual: {latitude}, {longitude}
-                    </h6>
-                    <GoogleMapReact
-                        bootstrapURLKeys={{ key: '' }}
-                        defaultCenter={center}
-                        defaultZoom={zoom}
-                    >
-                        <AnyReactComponent
-                            lat={latitude}
-                            lng={longitude}
-                            nome={'Sua Localização'}
-                        />
-                        {this.state.marcadores.map((marcador) => {
-                            return (
-                                <AnyReactComponent
-                                    lat={marcador.coords.lat}
-                                    lng={marcador.coords.long}
-                                    nome={marcador.nome}
-                                    onChildClick={marcador.descricao}
-                                    hover={marcador.desc}
-                                />
-                            )
-                        })}
-                    </GoogleMapReact>
+                    <div className='container'>
+                        <div className='row'>
+                            <div className='google-map' style={style}>
+                                <div className='card mt-3 mb-3'>
+                                    <div className='card-header'><h6>Coordenadas Locais</h6></div>
+                                    <div className='card-body'>
+                                        Geolocator:
+                                        
+                                        <p>API: {latitude}, {longitude}</p>
+                                    </div>
+                                </div>
+
+                                <GoogleMapReact
+                                    bootstrapURLKeys={{ key: '' }}
+                                    defaultCenter={center}
+                                    defaultZoom={zoom}
+                                >
+                                    <AnyReactComponent
+                                        lat={latitude}
+                                        lng={longitude}
+                                        nome={'Sua Localização'}
+                                    />
+                                    {this.state.marcadores.map((marcador) => {
+                                        return (
+                                            <AnyReactComponent
+                                                lat={marcador.coords.lat}
+                                                lng={marcador.coords.long}
+                                                nome={marcador.nome}
+                                                onChildClick={marcador.descricao}
+                                                hover={marcador.desc}
+                                            />
+                                        )
+                                    })}
+                                </GoogleMapReact>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             );
         }

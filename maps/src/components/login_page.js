@@ -57,21 +57,19 @@ class Login extends Component {
         return (
             <div>
                 <Navbar />
-
-
                 <div>
                     <h1>Login!</h1>
                     <div>
                         <label>
                             Email:
-                <input type="text" name="email"
+                <input type="text" name="email" className="form-control"
                                 value={this.state.email} onChange={this.atualizarEmail} />
                         </label>
                     </div>
                     <div>
                         <label>
                             Senha:
-                <input type="password" name="senha"
+                <input type="password" name="senha" className="form-control"
                                 value={this.state.senha} onChange={this.atualizarSenha} />
                         </label>
                     </div>
