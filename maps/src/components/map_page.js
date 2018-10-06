@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import GoogleMapReact from 'google-map-react';
-import geolocated from './geolocator.js'
+import Demo from './geolocator.js'
 import Navbar from './navbar/navbar.js'
 import firebase from 'firebase';
 import icon from './icon.png';
@@ -14,41 +14,46 @@ export default class Mapa extends Component {
 
         this.state = {
             lat: '', lon: '', carregado: false, status: null, marcadores: [],
-            categorias: []
+            categorias: [], logado: false, usuario: null
         };
+    }
+
+    componentWillMount() {
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                this.setState({logado: true, usuario: user});
+            } else {
+                this.setState({logado: false, usuario: null});
+            }
+        });
     }
 
     componentDidMount() {
         fetch("http://ip-api.com/json")
             .then(res => res.json())
-            .then(
-                (result) => {
-                    console.log(result);
-                    this.setState({
-                        carregado: true,
-                        lat: result.lat,
-                        lon: result.lon
-                        //lat:-9.6640396,
-                        //lon:-35.7303309
-                    });
-
-                },
+            .then((result) => {
+                console.log(result);
+                this.setState({
+                    carregado: true,
+                    lat: result.lat,
+                    lon: result.lon
+                    //lat:-9.6640396,
+                    //lon:-35.7303309
+                });
+            },
                 (error) => {
                     this.setState({
                         carregado: false,
                         status: error
                     });
-                }
-            )
+                })
         const db = firebase.firestore();
         db.collection('marcadores').get().then((querySnapshot) => {
             const marcadores = [];
             querySnapshot.forEach((doc) => {
                 // doc.data() is never undefined for query doc snapshots
                 console.log(doc.id, " => ", doc.data());
-
                 const { categoria, coords, nome, descricao } = doc.data();
-
                 marcadores.push({
                     key: doc.id,
                     categoria: categoria,
@@ -58,7 +63,6 @@ export default class Mapa extends Component {
                 });
             }
             );
-
             this.setState({
                 marcadores: marcadores,
             });
@@ -71,18 +75,13 @@ export default class Mapa extends Component {
             querySnapshot.forEach((doc) => {
                 // doc.data() is never undefined for query doc snapshots
                 console.log(doc.id, " => ", doc.data());
-
                 const { nome } = doc.data();
-
                 categorias.push({
                     key: doc.id,
                     nome: nome,
                 });
-
-
             }
             );
-
             this.setState({
                 categorias: categorias,
             });
@@ -101,21 +100,20 @@ export default class Mapa extends Component {
             const latitude = this.state.lat;
             const longitude = this.state.lon;
             var center = { lat: latitude, lng: longitude };
-            var zoom = 12;
+            var zoom = 13;
             console.log(this.state);
-            console.log(geolocated.geoPropTypes.coords);
+            //console.log(geolocated.geoPropTypes.coords);
             return (
-
                 <div className>
-                    <Navbar />
+                    <Navbar logado={this.state.logado} usuario={this.state.usuario} />
                     <div className='container'>
                         <div className='row'>
                             <div className='google-map' style={style}>
                                 <div className='card mt-3 mb-3'>
                                     <div className='card-header'><h6>Coordenadas Locais</h6></div>
                                     <div className='card-body'>
-                                        Geolocator:
-                                        
+                                        Geolocator: <Demo />
+
                                         <p>API: {latitude}, {longitude}</p>
                                     </div>
                                 </div>

@@ -9,7 +9,9 @@ class Login extends Component {
 
         this.state = {
             email: '',
-            senha: ''
+            senha: '',
+            logado: false,
+            usuario: null
         };
 
         this.loginUsuario = this.loginUsuario.bind(this);
@@ -17,6 +19,16 @@ class Login extends Component {
         this.atualizarEmail = this.atualizarEmail.bind(this);
         this.atualizarSenha = this.atualizarSenha.bind(this);
 
+    }
+
+    componentWillMount() {
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                this.setState({ logado: true, usuario: user });
+            } else {
+                this.setState({ logado: false, usuario: null });
+            }
+        });
     }
 
     atualizarEmail(event) {
@@ -54,34 +66,47 @@ class Login extends Component {
     }
 
     render() {
-        return (
-            <div>
-                <Navbar />
+        if (!this.state.logado) {
+            return (
                 <div>
-                    <h1>Login!</h1>
-                    <div>
-                        <label>
-                            Email:
-                <input type="text" name="email" className="form-control"
-                                value={this.state.email} onChange={this.atualizarEmail} />
-                        </label>
+                    <Navbar logado={this.state.logado} usuario={this.state.usuario} />
+                    <div className="container">
+                        <div className="row justify-content-center">
+                            <div className="card mt-2 mb-2" style={{ width: '25rem' }}>
+                                <div className="card-header">Login / Cadastro</div>
+                                <div className="card-body">
+                                    <div className="form-group">
+                                        <label htmlFor="email">Email</label>
+                                        <input type="text" id="email" name="email" className="form-control"
+                                            value={this.state.email} onChange={this.atualizarEmail} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="senha">Senha</label>
+                                        <input type="password" id="senha" name="senha" className="form-control"
+                                            value={this.state.senha} onChange={this.atualizarSenha} />
+                                    </div>
+                                    <div>
+                                        <a className="btn btn-block btn-primary mb-2" onClick={this.loginUsuario}><span className="text-light">Login</span></a>
+                                    </div>
+                                    <div>
+                                        <a className="btn btn-block btn-secondary mb-2" onClick={this.cadastrarUsuario}><span className="text-light">Cadastrar</span></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label>
-                            Senha:
-                <input type="password" name="senha" className="form-control"
-                                value={this.state.senha} onChange={this.atualizarSenha} />
-                        </label>
-                    </div>
-                    <div>
-                        <a onClick={this.cadastrarUsuario}>Cadastrar</a>
-                    </div>
-                    <div>
-                        <a onClick={this.loginUsuario}>Login</a>
-                    </div>
+
                 </div>
-            </div>
-        );
+            );
+        } else{
+            return (
+                <div>
+                    <Navbar logado={this.state.logado} usuario={this.state.usuario} />
+                    <h6 className="mt-3 ml-3">Você já está logado.</h6>
+                </div>
+            )
+        }
+
 
     }
 }
