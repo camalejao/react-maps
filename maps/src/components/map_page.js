@@ -4,9 +4,10 @@ import Demo from './geolocator.js'
 import Navbar from './navbar/navbar.js'
 import firebase from 'firebase';
 import icon from './icon.png';
-import marker from './marker.css';
+import marker from './markers/marker.css';
+import Marcador from './markers/marcador.js';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const AnyReactComponent = ({ nome }) => <div><img src={icon} className="marker" title={nome} /></div>;
 export default class Mapa extends Component {
 
     constructor(props) {
@@ -21,9 +22,9 @@ export default class Mapa extends Component {
     componentWillMount() {
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
-                this.setState({logado: true, usuario: user});
+                this.setState({ logado: true, usuario: user });
             } else {
-                this.setState({logado: false, usuario: null});
+                this.setState({ logado: false, usuario: null });
             }
         });
     }
@@ -92,8 +93,8 @@ export default class Mapa extends Component {
 
     render() {
         const style = {
-            width: '50vw',
-            height: '50vh'
+            width: '50rem',
+            height: '25rem'
         }
 
         if (this.state.carregado) {
@@ -107,30 +108,30 @@ export default class Mapa extends Component {
                 <div className>
                     <Navbar logado={this.state.logado} usuario={this.state.usuario} />
                     <div className='container'>
-                        <div className='row'>
-                            <div className='google-map' style={style}>
-                                <div className='card mt-3 mb-3'>
-                                    <div className='card-header'><h6>Coordenadas Locais</h6></div>
-                                    <div className='card-body'>
-                                        Geolocator: <Demo />
+                        <div className='row justify-content-center'>
+                            <div className='card mt-3 mb-3' style={{ width: '50rem' }}>
+                                <div className='card-header'><h6>Coordenadas Locais <FontAwesomeIcon icon="adn" /></h6></div>
+                                <div className='card-body'>
+                                    Geolocator: <Demo />
 
-                                        <p>API: {latitude}, {longitude}</p>
-                                    </div>
+                                    <p>API: {latitude}, {longitude}</p>
+                                    <p></p>
                                 </div>
-
+                            </div>
+                            <div className='google-map' style={style}>
                                 <GoogleMapReact
                                     bootstrapURLKeys={{ key: '' }}
                                     defaultCenter={center}
                                     defaultZoom={zoom}
                                 >
-                                    <AnyReactComponent
+                                    <Marcador
                                         lat={latitude}
                                         lng={longitude}
                                         nome={'Sua Localização'}
                                     />
                                     {this.state.marcadores.map((marcador) => {
                                         return (
-                                            <AnyReactComponent
+                                            <Marcador
                                                 lat={marcador.coords.lat}
                                                 lng={marcador.coords.long}
                                                 nome={marcador.nome}

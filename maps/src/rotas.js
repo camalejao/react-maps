@@ -6,26 +6,29 @@ import Login from './components/login_page'
 import Logout from './components/logout'
 import Geolocator from './components/geolocator';
 import firebase from 'firebase';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 
- // Initialize Firebase
+library.add(faMapMarkerAlt);
+
+// Initialize Firebase
 
 
-
-
-export default class Rotas extends Component {   
-render(){
-    return (
-        <Router>
-            <Switch>
-                <Route exact path="/" component={Home} />
-                <Route exact path="/map" component={Mapa} />
-                <Route exact path="/geo" component={Geolocator} />
-                <Route exact path="/login" component={Login} />
-                <Route exact path="/logout" component={Logout} />
-            </Switch>
-        </Router>
-    );
-}
+export default class Rotas extends Component {
+    render() {
+        return (
+            <Router>
+                <Switch>
+                    <Route exact path="/" component={Home} />
+                    <Route exact path="/map" component={Mapa} />
+                    <Route exact path="/geo" component={Geolocator} />
+                    <Route exact path="/login" component={Login} />
+                    <Route exact path="/logout" component={Logout} />
+                </Switch>
+            </Router>
+        );
+    }
 
 
 }

@@ -13,3 +13,13 @@
 .marker:hover{
     z-index: 1;
 }
+.marker-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  user-select: none;
+  transform: translate(-50%, -50%);
+  color: #fff;
+}
