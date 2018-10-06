@@ -26,8 +26,6 @@ class Navbar extends React.Component {
                                 </a>
                                 <div className="dropdown-menu " aria-labelledby="navbarDropdown">
                                     <a className="dropdown-item" href="/login">Login/Cadastro</a>
-                                    <div className="dropdown-divider"></div>
-                                    <a className="dropdown-item" href="/logout">Sair</a>
                                 </div>
                             </li>
                         </ul>
