@@ -7,6 +7,7 @@ import icon from './icon.png';
 import marker from './markers/marker.css';
 import Marcador from './markers/marcador.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ReactTooltip from 'react-tooltip'
 
 export default class Mapa extends Component {
 
@@ -15,8 +16,11 @@ export default class Mapa extends Component {
 
         this.state = {
             lat: '', lon: '', carregado: false, status: null, marcadores: [],
-            categorias: [], logado: false, usuario: null
+            categorias: [], selecionados: [], logado: false, usuario: null
         };
+
+        this.filtrar = this.filtrar.bind(this);
+        this.limparFiltros = this.limparFiltros.bind(this);
     }
 
     componentWillMount() {
@@ -91,10 +95,37 @@ export default class Mapa extends Component {
         });
     }
 
+    filtrar(event) {
+        if (event.target.checked) {
+            var selec = this.state.selecionados;
+            selec.push(event.target.value);
+            this.setState({ selecionados: selec });
+        } else {
+            var selec = this.state.selecionados;
+            for (var i = selec.length - 1; i >= 0; i--) {
+                if (selec[i] === event.target.value)
+                    selec.splice(i, 1);
+            }
+            this.setState({ selecionados: selec });
+        }
+    }
+
+    limparFiltros() {
+        document.querySelectorAll('input[type=checkbox]').forEach(el => {
+            el.checked = false;
+            var selec = this.state.selecionados;
+            for (var i = selec.length - 1; i >= 0; i--) {
+                if (selec[i] === el.value)
+                    selec.splice(i, 1);
+            }
+            this.setState({ selecionados: selec });
+        });
+    }
+
     render() {
         const style = {
-            width: '50rem',
-            height: '25rem'
+            //width: '50rem',
+            height: '40rem'
         }
 
         if (this.state.carregado) {
@@ -107,40 +138,63 @@ export default class Mapa extends Component {
             return (
                 <div className>
                     <Navbar logado={this.state.logado} usuario={this.state.usuario} />
-                    <div className='container'>
-                        <div className='row justify-content-center'>
-                            <div className='card mt-3 mb-3' style={{ width: '50rem' }}>
-                                <div className='card-header'><h6>Coordenadas Locais <FontAwesomeIcon icon="adn" /></h6></div>
-                                <div className='card-body'>
-                                    Geolocator: <Demo />
+                    <div className='container-fluid mt-3'>
+                        <div className='row'>
+                            <div className='col-8'>
+                                <div className='google-map' style={style}>
+                                    <GoogleMapReact
+                                        bootstrapURLKeys={{ key: '' }}
+                                        defaultCenter={center}
+                                        defaultZoom={zoom}
+                                    >
 
-                                    <p>API: {latitude}, {longitude}</p>
-                                    <p></p>
+                                        {this.state.marcadores.map((marcador) => {
+                                            console.log(marcador);
+
+                                            var passou = false;
+                                            {
+                                                this.state.categorias.map((cat) => {
+                                                    if ((cat.key == marcador.categoria) && this.state.selecionados.includes(cat.nome))
+                                                        passou = true;
+                                                })
+                                            }
+
+                                            if (passou || !this.state.selecionados.length) {
+                                                return (
+                                                    <Marcador
+                                                        lat={marcador.coords.lat}
+                                                        lng={marcador.coords.long}
+                                                        nome={marcador.nome}
+                                                        onChildClick={marcador.descricao}
+                                                        hover={marcador.desc}
+                                                    />
+                                                )
+                                            }
+                                        })}
+                                    </GoogleMapReact>
                                 </div>
                             </div>
-                            <div className='google-map' style={style}>
-                                <GoogleMapReact
-                                    bootstrapURLKeys={{ key: '' }}
-                                    defaultCenter={center}
-                                    defaultZoom={zoom}
-                                >
-                                    <Marcador
-                                        lat={latitude}
-                                        lng={longitude}
-                                        nome={'Sua Localização'}
-                                    />
-                                    {this.state.marcadores.map((marcador) => {
-                                        return (
-                                            <Marcador
-                                                lat={marcador.coords.lat}
-                                                lng={marcador.coords.long}
-                                                nome={marcador.nome}
-                                                onChildClick={marcador.descricao}
-                                                hover={marcador.desc}
-                                            />
-                                        )
-                                    })}
-                                </GoogleMapReact>
+                            <div className="col-2">
+                                <div className='card'>
+                                    <div className='card-header'>
+                                        <span>Filtros </span>
+                                        <span data-tip="Apenas os marcadores das categorias selecionadas serão exibidos.<br>Para exibir todos, basta clicar em 'Limpar Filtros'.">
+                                            <FontAwesomeIcon icon='question-circle' size='sm' color='gray' />
+                                        </span>
+                                        <ReactTooltip multiline='true' />
+                                    </div>
+                                    <div className='card-body'>
+                                        {this.state.categorias.map((cat, n) => {
+                                            return (
+                                                <div className="custom-control custom-checkbox">
+                                                    <input type="checkbox" className="custom-control-input" id={'cat' + n} value={cat.nome} onChange={this.filtrar} />
+                                                    <label className="custom-control-label" htmlFor={'cat' + n}>{cat.nome}</label>
+                                                </div>
+                                            )
+                                        })}
+                                        <button className='btn btn-sm btn-outline-primary mt-3' onClick={this.limparFiltros}>Limpar Filtros</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

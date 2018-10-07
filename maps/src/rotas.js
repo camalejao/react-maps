@@ -8,9 +8,10 @@ import Geolocator from './components/geolocator';
 import firebase from 'firebase';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
+import { faMapMarkerAlt, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faMapMarkerAlt);
+library.add(faQuestionCircle);
 
 // Initialize Firebase
 
