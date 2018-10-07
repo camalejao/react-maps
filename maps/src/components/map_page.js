@@ -3,11 +3,11 @@ import GoogleMapReact from 'google-map-react';
 import Demo from './geolocator.js'
 import Navbar from './navbar/navbar.js'
 import firebase from 'firebase';
-import icon from './icon.png';
-import marker from './markers/marker.css';
 import Marcador from './markers/marcador.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ReactTooltip from 'react-tooltip'
+import NovoMarcador from './novo_marcador.js';
+
 
 export default class Mapa extends Component {
 
@@ -21,6 +21,7 @@ export default class Mapa extends Component {
 
         this.filtrar = this.filtrar.bind(this);
         this.limparFiltros = this.limparFiltros.bind(this);
+       
     }
 
     componentWillMount() {
@@ -94,6 +95,7 @@ export default class Mapa extends Component {
             console.error(error);
         });
     }
+    
 
     filtrar(event) {
         if (event.target.checked) {
@@ -172,7 +174,7 @@ export default class Mapa extends Component {
                                             }
                                         })}
                                     </GoogleMapReact>
-                                </div>
+                                </div>                                                              
                             </div>
                             <div className="col-2">
                                 <div className='card'>
@@ -195,6 +197,17 @@ export default class Mapa extends Component {
                                         <button className='btn btn-sm btn-outline-primary mt-3' onClick={this.limparFiltros}>Limpar Filtros</button>
                                     </div>
                                 </div>
+                            </div>
+                            <div className="col-2">
+                                <div className="card">
+                                    <div className="card-header">
+                                    <span>Novo Marcador</span>
+                                    </div> 
+                                    <div className="card-body">
+                                        <NovoMarcador/>
+                                    </div>                           
+                                </div>
+                                    
                             </div>
                         </div>
                     </div>
