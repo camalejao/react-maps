@@ -23,7 +23,10 @@ class Login extends Component {
 
     componentWillMount() {
         firebase.auth().onAuthStateChanged(user => {
+            const db = firebase.firestore();
             if (user) {
+                var ref = db.collection('categoria').doc('7').collection("users");
+                ref.doc(user.uid).set({});
                 this.setState({ logado: true, usuario: user });
             } else {
                 this.setState({ logado: false, usuario: null });
@@ -98,7 +101,7 @@ class Login extends Component {
 
                 </div>
             );
-        } else{
+        } else {
             return (
                 <div>
                     <Navbar logado={this.state.logado} usuario={this.state.usuario} />
