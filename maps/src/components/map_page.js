@@ -21,10 +21,11 @@ export default class Mapa extends Component {
 
         this.filtrar = this.filtrar.bind(this);
         this.limparFiltros = this.limparFiltros.bind(this);
-       
+
     }
 
     componentWillMount() {
+        firebase.auth().isSignInWithEmailLink
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 this.setState({ logado: true, usuario: user });
@@ -95,7 +96,7 @@ export default class Mapa extends Component {
             console.error(error);
         });
     }
-    
+
 
     filtrar(event) {
         if (event.target.checked) {
@@ -127,7 +128,7 @@ export default class Mapa extends Component {
     render() {
         const style = {
             //width: '50rem',
-            height: '40rem'
+            height: '30rem'
         }
 
         if (this.state.carregado) {
@@ -149,10 +150,8 @@ export default class Mapa extends Component {
                                         defaultCenter={center}
                                         defaultZoom={zoom}
                                     >
-
                                         {this.state.marcadores.map((marcador) => {
                                             console.log(marcador);
-
                                             var passou = false;
                                             {
                                                 this.state.categorias.map((cat) => {
@@ -160,7 +159,6 @@ export default class Mapa extends Component {
                                                         passou = true;
                                                 })
                                             }
-
                                             if (passou || !this.state.selecionados.length) {
                                                 return (
                                                     <Marcador
@@ -174,9 +172,9 @@ export default class Mapa extends Component {
                                             }
                                         })}
                                     </GoogleMapReact>
-                                </div>                                                              
+                                </div>
                             </div>
-                            <div className="col-2">
+                            <div className="col-4">
                                 <div className='card'>
                                     <div className='card-header'>
                                         <span>Filtros </span>
@@ -197,17 +195,18 @@ export default class Mapa extends Component {
                                         <button className='btn btn-sm btn-outline-primary mt-3' onClick={this.limparFiltros}>Limpar Filtros</button>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="col-2">
-                                <div className="card">
+                                <div className="card mt-2 mb-3">
                                     <div className="card-header">
-                                    <span>Novo Marcador</span>
-                                    </div> 
+                                        <span>Novo Marcador</span>
+                                    </div>
                                     <div className="card-body">
-                                        <NovoMarcador/>
-                                    </div>                           
+                                        {this.state.usuario ?
+                                            <NovoMarcador categorias={this.state.categorias} />
+                                            :
+                                            <p>Você precisa estar logado para adicionar novos marcadores.</p>
+                                        }
+                                    </div>
                                 </div>
-                                    
                             </div>
                         </div>
                     </div>
@@ -215,7 +214,12 @@ export default class Mapa extends Component {
             );
         }
         else
-            return <div>Carregando</div>
+            return (
+                <div>
+                    <Navbar logado={this.state.logado} usuario={this.state.usuario} />
+                    Carregando
+                </div>
+            )
     }
 }
 
