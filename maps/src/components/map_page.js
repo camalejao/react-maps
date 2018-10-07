@@ -25,7 +25,6 @@ export default class Mapa extends Component {
     }
 
     componentWillMount() {
-        firebase.auth().isSignInWithEmailLink
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 this.setState({ logado: true, usuario: user });
