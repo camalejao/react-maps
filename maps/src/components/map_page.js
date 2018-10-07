@@ -149,7 +149,7 @@ export default class Mapa extends Component {
                                         defaultCenter={center}
                                         defaultZoom={zoom}
                                     >
-                                        {this.state.marcadores.map((marcador) => {
+                                        {this.state.marcadores.map((marcador, n) => {
                                             console.log(marcador);
                                             var passou = false;
                                             {
@@ -164,8 +164,8 @@ export default class Mapa extends Component {
                                                         lat={marcador.coords.lat}
                                                         lng={marcador.coords.long}
                                                         nome={marcador.nome}
-                                                        onChildClick={marcador.descricao}
-                                                        hover={marcador.desc}
+                                                        descricao={marcador.descricao}
+                                                        n={n}
                                                     />
                                                 )
                                             }
@@ -177,10 +177,10 @@ export default class Mapa extends Component {
                                 <div className='card'>
                                     <div className='card-header'>
                                         <span>Filtros </span>
-                                        <span data-tip="Apenas os marcadores das categorias selecionadas serão exibidos.<br>Para exibir todos, basta clicar em 'Limpar Filtros'.">
+                                        <span data-for='duvida' data-tip="Apenas os marcadores das categorias selecionadas serão exibidos.<br>Para exibir todos, basta clicar em 'Limpar Filtros'.">
                                             <FontAwesomeIcon icon='question-circle' size='sm' color='gray' />
                                         </span>
-                                        <ReactTooltip multiline='true' />
+                                        <ReactTooltip id='duvida' multiline='true' />
                                     </div>
                                     <div className='card-body'>
                                         {this.state.categorias.map((cat, n) => {
