@@ -23,6 +23,7 @@ export default class Mapa extends Component {
         this.filtrar = this.filtrar.bind(this);
         this.limparFiltros = this.limparFiltros.bind(this);
         this.addFavorito = this.addFavorito.bind(this);
+        this.remvFavorito = this.remvFavorito.bind(this);
         this.selecionarMarcador = this.selecionarMarcador.bind(this);
     }
 
@@ -182,6 +183,19 @@ export default class Mapa extends Component {
                 });
         } else (console.log('não está logado'))
     }
+    remvFavorito() {
+        if (this.state.usuario) {
+            const marker = this.state.marcadorSelecionado.marker;
+            const db = firebase.firestore();
+            db.collection("favoritos").doc(this.state.usuario.uid).collection("marcadores").doc(marker.key).delete().then(function(){
+                console.log("Documento deletado!");
+                window.location.reload();
+            })
+            .catch(function(error){
+                console.error("Erro ao tentar deletar o documento ", error)
+            });
+        } else (console.log ("Usuário não está logado"))
+    }
 
     selecionarMarcador(key, childProps){
         this.setState({marcadorSelecionado: childProps});
@@ -247,8 +261,10 @@ export default class Mapa extends Component {
                                         <h5>{this.state.marcadorSelecionado.marker.nome}</h5>
                                         <p>{this.state.marcadorSelecionado.marker.descricao}</p>
                                         <button className='btn btn-sm btn-outline-primary' onClick={this.addFavorito}>Add aos Favoritos</button>
+                                        <button className='btn btn-sm btn-outline-primary' onClick={this.remvFavorito}>Remover dos Favoritos</button>
                                     </div>
                                 </div>
+                                
                                 <div className='card'>
                                     <div className='card-header'>
                                         <span>Filtros </span>
