@@ -123,7 +123,6 @@ export default class Mapa extends Component {
             db.collection('favoritos').doc(this.state.usuario['uid']).collection('marcadores').get().then((querySnapshot) => {
                 const favoritos = [];
                 querySnapshot.forEach((doc) => {
-                    console.log(doc.id, " => ", doc.data());
                     const { nome } = doc.data();
                     favoritos.push({
                         key: doc.id,

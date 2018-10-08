@@ -13,10 +13,17 @@ export default class Marcador extends Component {
 
     addMarcador() {
         if (this.props.usuario) {
-            console.log(this.props.lat, this.props.lng, this.props.nome);
-            const db = firebase.firestore();
             const marker = this.props.marker;
-            db.collection("favoritos").doc(this.props.usuario.uid).collection("marcadores").doc(marker.key).set({nome: marker.nome})
+            console.log(this.props.lat, this.props.lng, marker.nome);
+            const db = firebase.firestore();
+            db.collection("favoritos").doc(this.props.usuario.uid).collection("marcadores").doc(marker.key).set({ nome: marker.nome })
+                .then(function () {
+                    console.log("Document successfully written!");
+                    window.location.reload();
+                })
+                .catch(function (error) {
+                    console.error("Error writing document: ", error);
+                });
         } else (console.log('não está logado'))
     }
 
