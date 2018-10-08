@@ -17,12 +17,13 @@ export default class Mapa extends Component {
         this.state = {
             lat: '', lon: '', carregado: false, status: null, marcadores: [],
             categorias: [], selecionados: [], logado: false, usuario: null,
-            inserido: false, favoritos: [], favs: false
+            inserido: false, favoritos: [], favs: false, marcadorSelecionado: {marker:{nome:'', descricao:''}}
         };
 
         this.filtrar = this.filtrar.bind(this);
         this.limparFiltros = this.limparFiltros.bind(this);
-
+        this.addFavorito = this.addFavorito.bind(this);
+        this.selecionarMarcador = this.selecionarMarcador.bind(this);
     }
 
     componentWillMount() {
@@ -166,13 +167,25 @@ export default class Mapa extends Component {
         });
     }
 
-    _addMarcador = ({ lat, lng, nome, event }) => console.log(lat, lng, nome, event)
-    //addMarcador(event){
-    // var marc = event;
-    //console.log(marc);
-    //var ref = firebase.firestore().collection("favoritos").doc(this.state.usuario.uid).collection("marcadores");
-    //ref.push(marc)
-    //}
+    addFavorito() {
+        if (this.state.usuario) {
+            const marker = this.state.marcadorSelecionado.marker;
+            console.log(this.state.marcadorSelecionado.lat, this.state.marcadorSelecionado.lng, marker.nome);
+            const db = firebase.firestore();
+            db.collection("favoritos").doc(this.state.usuario.uid).collection("marcadores").doc(marker.key).set({ nome: marker.nome })
+                .then(function () {
+                    console.log("Document successfully written!");
+                    window.location.reload();
+                })
+                .catch(function (error) {
+                    console.error("Error writing document: ", error);
+                });
+        } else (console.log('não está logado'))
+    }
+
+    selecionarMarcador(key, childProps){
+        this.setState({marcadorSelecionado: childProps});
+    }
 
     render() {
         const style = {
@@ -195,6 +208,7 @@ export default class Mapa extends Component {
                                         bootstrapURLKeys={{ key: '' }}
                                         defaultCenter={center}
                                         defaultZoom={zoom}
+                                        onChildClick={this.selecionarMarcador}
                                     >
                                         {this.state.marcadores.map((marcador, n) => {
                                             var passou = false;
@@ -228,6 +242,13 @@ export default class Mapa extends Component {
                                 </div>
                             </div>
                             <div className="col-4">
+                                <div className='card mb-3'>
+                                    <div className='card-body'>
+                                        <h5>{this.state.marcadorSelecionado.marker.nome}</h5>
+                                        <p>{this.state.marcadorSelecionado.marker.descricao}</p>
+                                        <button className='btn btn-sm btn-outline-primary' onClick={this.addFavorito}>Add aos Favoritos</button>
+                                    </div>
+                                </div>
                                 <div className='card'>
                                     <div className='card-header'>
                                         <span>Filtros </span>
