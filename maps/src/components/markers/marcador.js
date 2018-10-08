@@ -11,7 +11,7 @@ export default class Marcador extends Component {
         const marker = this.props.marker;
         const n = this.props.n;
         return (
-            <div className='marker' title={marker.nome} data-tip={marker.descricao} data-for={'tip' + n} onClick={this.addFavorito}>
+            <div className='marker' title={marker.nome} data-tip={marker.descricao} data-for={'tip' + n}>
                 <div className='row justify-content-center'>
                     <FontAwesomeIcon icon="map-marker-alt" size="2x" className="marker-icon" />
                 </div>
