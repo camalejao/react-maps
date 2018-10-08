@@ -48,7 +48,6 @@ class Home extends React.Component {
   }
 
   render() {
-    console.log(process.env.REACT_APP_MAPKEY)
     return (
       <div>
         <Navbar logado={this.state.logado} usuario={this.state.usuario} />

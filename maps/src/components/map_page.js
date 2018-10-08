@@ -16,7 +16,8 @@ export default class Mapa extends Component {
 
         this.state = {
             lat: '', lon: '', carregado: false, status: null, marcadores: [],
-            categorias: [], selecionados: [], logado: false, usuario: null
+            categorias: [], selecionados: [], logado: false, usuario: null,
+            inserido: false
         };
 
         this.filtrar = this.filtrar.bind(this);
@@ -28,7 +29,28 @@ export default class Mapa extends Component {
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 this.setState({ logado: true, usuario: user });
+
+                console.log("logado")
+                var id = this.state.usuario.uid;
+                var ref = firebase.firestore().collection("favoritos");
+                ref.get().then(function (querySnapshot) {
+                    querySnapshot.forEach(function (doc) {
+                        if (doc.id === id) {
+                            console.log("UID já cadastrada");
+                            this.setState({inserido: true})
+                            return;
+                        } else if (this.state.inserido === false){
+                            console.log("UID cadastrada")
+                            ref.doc(id).set({});
+                            this.setState({inserido: true})
+                            return;
+                        }
+
+                    });
+                });
+
             } else {
+                console.log("não logado")
                 this.setState({ logado: false, usuario: null });
             }
         });
@@ -124,6 +146,14 @@ export default class Mapa extends Component {
         });
     }
 
+    _addMarcador = ({lat, lng, nome, event}) => console.log(lat, lng, nome, event)
+    //addMarcador(event){
+       // var marc = event;
+        //console.log(marc);
+        //var ref = firebase.firestore().collection("favoritos").doc(this.state.usuario.uid).collection("marcadores");
+        //ref.push(marc)
+    //}
+
     render() {
         const style = {
             //width: '50rem',
@@ -166,6 +196,8 @@ export default class Mapa extends Component {
                                                         nome={marcador.nome}
                                                         descricao={marcador.descricao}
                                                         n={n}
+                                                        onClick={this._addMarcador}
+                                                        hover={marcador.desc}
                                                     />
                                                 )
                                             }
