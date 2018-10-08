@@ -23,10 +23,7 @@ class Login extends Component {
 
     componentWillMount() {
         firebase.auth().onAuthStateChanged(user => {
-            const db = firebase.firestore();
             if (user) {
-                var ref = db.collection('categoria').doc('7').collection("users");
-                ref.doc(user.uid).set({});
                 this.setState({ logado: true, usuario: user });
             } else {
                 this.setState({ logado: false, usuario: null });
