@@ -17,7 +17,7 @@ export default class Mapa extends Component {
         this.state = {
             lat: '', lon: '', carregado: false, status: null, marcadores: [],
             categorias: [], selecionados: [], logado: false, usuario: null,
-            inserido: false
+            inserido: false, favoritos: [], favs: false
         };
 
         this.filtrar = this.filtrar.bind(this);
@@ -37,12 +37,12 @@ export default class Mapa extends Component {
                     querySnapshot.forEach(function (doc) {
                         if (doc.id === id) {
                             console.log("UID já cadastrada");
-                            this.setState({inserido: true})
+                            this.setState({ inserido: true })
                             return;
-                        } else if (this.state.inserido === false){
+                        } else if (this.state.inserido === false) {
                             console.log("UID cadastrada")
                             ref.doc(id).set({});
-                            this.setState({inserido: true})
+                            this.setState({ inserido: true })
                             return;
                         }
 
@@ -108,8 +108,7 @@ export default class Mapa extends Component {
                     key: doc.id,
                     nome: nome,
                 });
-            }
-            );
+            });
             this.setState({
                 categorias: categorias,
             });
@@ -118,6 +117,28 @@ export default class Mapa extends Component {
         });
     }
 
+    componentDidUpdate() {
+        if (this.state.logado && !this.state.favs) {
+            const db = firebase.firestore();
+            db.collection('favoritos').doc(this.state.usuario['uid']).collection('marcadores').get().then((querySnapshot) => {
+                const favoritos = [];
+                querySnapshot.forEach((doc) => {
+                    console.log(doc.id, " => ", doc.data());
+                    const { nome } = doc.data();
+                    favoritos.push({
+                        key: doc.id,
+                        nome: nome,
+                    });
+                });
+                this.setState({
+                    favoritos: favoritos,
+                    favs: true
+                });
+            }).catch((error) => {
+                console.error(error);
+            });
+        }
+    }
 
     filtrar(event) {
         if (event.target.checked) {
@@ -146,12 +167,12 @@ export default class Mapa extends Component {
         });
     }
 
-    _addMarcador = ({lat, lng, nome, event}) => console.log(lat, lng, nome, event)
+    _addMarcador = ({ lat, lng, nome, event }) => console.log(lat, lng, nome, event)
     //addMarcador(event){
-       // var marc = event;
-        //console.log(marc);
-        //var ref = firebase.firestore().collection("favoritos").doc(this.state.usuario.uid).collection("marcadores");
-        //ref.push(marc)
+    // var marc = event;
+    //console.log(marc);
+    //var ref = firebase.firestore().collection("favoritos").doc(this.state.usuario.uid).collection("marcadores");
+    //ref.push(marc)
     //}
 
     render() {
@@ -159,14 +180,11 @@ export default class Mapa extends Component {
             //width: '50rem',
             height: '30rem'
         }
-
         if (this.state.carregado) {
             const latitude = this.state.lat;
             const longitude = this.state.lon;
             var center = { lat: latitude, lng: longitude };
             var zoom = 13;
-            console.log(this.state);
-            //console.log(geolocated.geoPropTypes.coords);
             return (
                 <div className>
                     <Navbar logado={this.state.logado} usuario={this.state.usuario} />
@@ -180,7 +198,6 @@ export default class Mapa extends Component {
                                         defaultZoom={zoom}
                                     >
                                         {this.state.marcadores.map((marcador, n) => {
-                                            console.log(marcador);
                                             var passou = false;
                                             {
                                                 this.state.categorias.map((cat) => {
@@ -188,16 +205,22 @@ export default class Mapa extends Component {
                                                         passou = true;
                                                 })
                                             }
+                                            if (this.state.selecionados.includes('favoritos')) {
+                                                {
+                                                    this.state.favoritos.map((fav) => {
+                                                        if(fav.key == marcador.key)
+                                                            passou = true;
+                                                    })
+                                                }
+                                            }
                                             if (passou || !this.state.selecionados.length) {
                                                 return (
                                                     <Marcador
                                                         lat={marcador.coords.lat}
                                                         lng={marcador.coords.long}
-                                                        nome={marcador.nome}
-                                                        descricao={marcador.descricao}
                                                         n={n}
-                                                        onClick={this._addMarcador}
-                                                        hover={marcador.desc}
+                                                        marker={marcador}
+                                                        usuario={this.state.usuario}
                                                     />
                                                 )
                                             }
@@ -215,6 +238,10 @@ export default class Mapa extends Component {
                                         <ReactTooltip id='duvida' multiline='true' />
                                     </div>
                                     <div className='card-body'>
+                                        <div className="custom-control custom-checkbox">
+                                            <input type="checkbox" className="custom-control-input" id='favoritos' value='favoritos' onChange={this.filtrar} />
+                                            <label className="custom-control-label" htmlFor='favoritos'>Favoritos</label>
+                                        </div>
                                         {this.state.categorias.map((cat, n) => {
                                             return (
                                                 <div className="custom-control custom-checkbox">

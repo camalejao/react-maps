@@ -73,7 +73,6 @@ export default class NovoMarcador extends Component {
 
     render() {
         var categorias = this.props.categorias;
-        console.log(categorias);
         return (
             <div>
                 <div className="form-group">
@@ -96,7 +95,7 @@ export default class NovoMarcador extends Component {
                     <label htmlFor="selectCategoria">Categoria</label>
                     <select class="form-control" id="selectCategoria" onChange={this.atualizarCategoriaNovoMarcador}>
                         <option defaultChecked hidden='true'>Selecione...</option>
-                        {this.props.categorias.map((cat) => {
+                        {categorias.map((cat) => {
                             return (
                                 <option value={cat.key}>{cat.nome}</option>
                             )
