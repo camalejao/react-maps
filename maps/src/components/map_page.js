@@ -17,7 +17,8 @@ export default class Mapa extends Component {
         this.state = {
             lat: '', lon: '', carregado: false, status: null, marcadores: [],
             categorias: [], selecionados: [], logado: false, usuario: null,
-            inserido: false, favoritos: [], favs: false, marcadorSelecionado: {marker:{nome:'', descricao:''}}
+            inserido: false, favoritos: [], favs: false, marcadorSelecionado: { marker: { nome: '', descricao: ''} },
+            selecionado: false
         };
 
         this.filtrar = this.filtrar.bind(this);
@@ -187,21 +188,25 @@ export default class Mapa extends Component {
         if (this.state.usuario) {
             const marker = this.state.marcadorSelecionado.marker;
             const db = firebase.firestore();
-            db.collection("favoritos").doc(this.state.usuario.uid).collection("marcadores").doc(marker.key).delete().then(function(){
+            db.collection("favoritos").doc(this.state.usuario.uid).collection("marcadores").doc(marker.key).delete().then(function () {
                 console.log("Documento deletado!");
                 window.location.reload();
             })
-            .catch(function(error){
-                console.error("Erro ao tentar deletar o documento ", error)
-            });
-        } else (console.log ("Usuário não está logado"))
+                .catch(function (error) {
+                    console.error("Erro ao tentar deletar o documento ", error)
+                });
+        } else (console.log("Usuário não está logado"))
     }
 
-    selecionarMarcador(key, childProps){
-        this.setState({marcadorSelecionado: childProps});
+    selecionarMarcador(key, childProps) {
+        this.setState({ marcadorSelecionado: childProps, selecionado: true });
+        console.log(childProps.marker.categoria);
+        console.log(this.state.categorias[childProps.marker.categoria-1]);
     }
 
     render() {
+        var ehFavorito = false;
+        var categorias = this.state.categorias;
         const style = {
             //width: '50rem',
             height: '30rem'
@@ -235,7 +240,7 @@ export default class Mapa extends Component {
                                             if (this.state.selecionados.includes('favoritos')) {
                                                 {
                                                     this.state.favoritos.map((fav) => {
-                                                        if(fav.key == marcador.key)
+                                                        if (fav.key === marcador.key)
                                                             passou = true;
                                                     })
                                                 }
@@ -256,18 +261,44 @@ export default class Mapa extends Component {
                                 </div>
                             </div>
                             <div className="col-4">
-                                <div className='card mb-3'>
-                                    <div className='card-body'>
-                                        <h5>{this.state.marcadorSelecionado.marker.nome}</h5>
-                                        <p>{this.state.marcadorSelecionado.marker.descricao}</p>
-                                        <button className='btn btn-sm btn-outline-primary' onClick={this.addFavorito}>Add aos Favoritos</button>
-                                        <button className='btn btn-sm btn-outline-primary' onClick={this.remvFavorito}>Remover dos Favoritos</button>
+                                {this.state.selecionado ?
+                                    <div className='card mb-3'>
+                                        <div className='card-body'>
+                                            {this.state.favoritos ?
+                                                <div>
+                                                    {this.state.favoritos.map((fav) => {
+                                                        if (fav.key === this.state.marcadorSelecionado.marker.key)
+                                                            ehFavorito = true;
+                                                    })}
+                                                </div>
+                                                :
+                                                <div>
+                                                    {ehFavorito = false}
+                                                </div>
+                                            }
+                                            <h5>
+                                                {this.state.marcadorSelecionado.marker.nome}&nbsp;
+                                                {ehFavorito ?
+                                                    <span onClick={this.remvFavorito} title='Remover Favorito' style={{cursor: 'pointer'}}>
+                                                        <FontAwesomeIcon clickable='true' icon='heart' color='red' />
+                                                    </span>
+                                                    :
+                                                    <span onClick={this.addFavorito} title='Adicionar Favorito' style={{cursor: 'pointer'}}>
+                                                        <FontAwesomeIcon icon={['far', 'heart']} />
+                                                    </span>
+                                                }
+                                            </h5>
+                                            <p>{categorias[this.state.marcadorSelecionado.marker.categoria -1].nome}</p>
+                                            <p>{this.state.marcadorSelecionado.marker.descricao}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                
+                                    :
+                                    <div></div>
+                                }
+
                                 <div className='card'>
                                     <div className='card-header'>
-                                        <span>Filtros </span>
+                                        <span>Filtrar por categoria </span>
                                         <span data-for='duvida' data-tip="Apenas os marcadores das categorias selecionadas serão exibidos.<br>Para exibir todos, basta clicar em 'Limpar Filtros'.">
                                             <FontAwesomeIcon icon='question-circle' size='sm' color='gray' />
                                         </span>
