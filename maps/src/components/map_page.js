@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import GoogleMapReact from 'google-map-react';
-import Demo from './geolocator.js'
 import Navbar from './navbar/navbar.js'
 import firebase from 'firebase';
 import Marcador from './markers/marcador.js';

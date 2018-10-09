@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import marker from './marker.css';
-import firebase from 'firebase';
-import ReactTooltip from 'react-tooltip'
-import NovoMarcador from '../novo_marcador';
+import ReactTooltip from 'react-tooltip';
 
 export default class Marcador extends Component {
 

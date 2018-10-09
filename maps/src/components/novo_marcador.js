@@ -35,11 +35,6 @@ export default class NovoMarcador extends Component {
             });
     }
 
-    atualizarCategoriaNovoMarcador(event) {
-        var marcador = this.state.novo_marcador;
-        marcador.descricao = event.target.value;
-        this.setState({ novo_marcador: marcador });
-    }
     atualizarLatitudeNovoMarcador(event) {
         var marcador = this.state.novo_marcador;
         marcador.coords.lat = event.target.value;
@@ -51,16 +46,19 @@ export default class NovoMarcador extends Component {
         marcador.coords.long = event.target.value;
         this.setState({ novo_marcador: marcador });
     }
+
     atualizarNomeNovoMarcador(event) {
         var marcador = this.state.novo_marcador;
         marcador.nome = event.target.value;
         this.setState({ novo_marcador: marcador });
     }
+
     atualizarDescricaoNovoMarcador(event) {
         var marcador = this.state.novo_marcador;
         marcador.descricao = event.target.value;
         this.setState({ novo_marcador: marcador });
     }
+    
     atualizarCategoriaNovoMarcador(event) {
         var marcador = this.state.novo_marcador;
         marcador.categoria = event.target.value;
