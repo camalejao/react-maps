@@ -16,8 +16,8 @@ export default class Mapa extends Component {
         this.state = {
             lat: '', lon: '', carregado: false, status: null, marcadores: [],
             categorias: [], selecionados: [], logado: false, usuario: null,
-            inserido: false, favoritos: [], favs: false, marcadorSelecionado: { marker: { nome: '', descricao: ''} },
-            selecionado: false
+            inserido: false, favoritos: [], favs: false, marcadorSelecionado: { marker: { nome: '', descricao: '' } },
+            selecionado: false, admin: false
         };
 
         this.filtrar = this.filtrar.bind(this);
@@ -25,6 +25,7 @@ export default class Mapa extends Component {
         this.addFavorito = this.addFavorito.bind(this);
         this.remvFavorito = this.remvFavorito.bind(this);
         this.selecionarMarcador = this.selecionarMarcador.bind(this);
+        this.isAdmin = this.isAdmin.bind(this);
     }
 
     componentWillMount() {
@@ -34,23 +35,21 @@ export default class Mapa extends Component {
 
                 console.log("logado")
                 var id = this.state.usuario.uid;
+                var inserido = this.state.inserido;
                 var ref = firebase.firestore().collection("favoritos");
                 ref.get().then(function (querySnapshot) {
                     querySnapshot.forEach(function (doc) {
                         if (doc.id === id) {
                             console.log("UID já cadastrada");
-                            this.setState({ inserido: true })
-                            return;
-                        } else if (this.state.inserido === false) {
+                            inserido = true;
+                        } else if (inserido === false && this.state.usuario) {
                             console.log("UID cadastrada")
                             ref.doc(id).set({});
-                            this.setState({ inserido: true })
-                            return;
+                            inserido = true;
                         }
-
                     });
+                    this.setState({ inserido: inserido });
                 });
-
             } else {
                 console.log("não logado")
                 this.setState({ logado: false, usuario: null });
@@ -200,15 +199,32 @@ export default class Mapa extends Component {
     selecionarMarcador(key, childProps) {
         this.setState({ marcadorSelecionado: childProps, selecionado: true });
         console.log(childProps.marker.categoria);
-        console.log(this.state.categorias[childProps.marker.categoria-1]);
+        console.log(this.state.categorias[childProps.marker.categoria - 1]);
+    }
+
+    isAdmin() {
+        if (this.state.usuario) {
+            var isAdmin = false;
+            const db = firebase.firestore();
+            db.collection("admin").get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    if (doc.id === this.state.usuario.uid) {
+                        isAdmin = true;
+                    }
+                })
+                this.setState({ admin: isAdmin });
+            })
+        }
     }
 
     render() {
+        this.isAdmin();
         var ehFavorito = false;
         var categorias = this.state.categorias;
         const style = {
             //width: '50rem',
-            height: '30rem'
+            height: '50rem',
+            display: 'block'
         }
         if (this.state.carregado) {
             const latitude = this.state.lat;
@@ -278,16 +294,16 @@ export default class Mapa extends Component {
                                             <h5>
                                                 {this.state.marcadorSelecionado.marker.nome}&nbsp;
                                                 {ehFavorito ?
-                                                    <span onClick={this.remvFavorito} title='Remover Favorito' style={{cursor: 'pointer'}}>
+                                                    <span onClick={this.remvFavorito} title='Remover Favorito' style={{ cursor: 'pointer' }}>
                                                         <FontAwesomeIcon clickable='true' icon='heart' color='red' />
                                                     </span>
                                                     :
-                                                    <span onClick={this.addFavorito} title='Adicionar Favorito' style={{cursor: 'pointer'}}>
+                                                    <span onClick={this.addFavorito} title='Adicionar Favorito' style={{ cursor: 'pointer' }}>
                                                         <FontAwesomeIcon icon={['far', 'heart']} />
                                                     </span>
                                                 }
                                             </h5>
-                                            <p>{categorias[this.state.marcadorSelecionado.marker.categoria -1].nome}</p>
+                                            <p>{categorias[this.state.marcadorSelecionado.marker.categoria - 1].nome}</p>
                                             <p>{this.state.marcadorSelecionado.marker.descricao}</p>
                                         </div>
                                     </div>
@@ -319,18 +335,22 @@ export default class Mapa extends Component {
                                         <button className='btn btn-sm btn-outline-primary mt-3' onClick={this.limparFiltros}>Limpar Filtros</button>
                                     </div>
                                 </div>
-                                <div className="card mt-2 mb-3">
-                                    <div className="card-header">
-                                        <span>Novo Marcador</span>
+                                {this.state.admin ?
+                                    <div className="card mt-2 mb-3">
+                                        <div className="card-header">
+                                            <span>Novo Marcador</span>
+                                        </div>
+                                        <div className="card-body">
+                                            {this.state.usuario ?
+                                                <NovoMarcador categorias={this.state.categorias} />
+                                                :
+                                                <p>Você precisa estar logado para adicionar novos marcadores.</p>
+                                            }
+                                        </div>
                                     </div>
-                                    <div className="card-body">
-                                        {this.state.usuario ?
-                                            <NovoMarcador categorias={this.state.categorias} />
-                                            :
-                                            <p>Você precisa estar logado para adicionar novos marcadores.</p>
-                                        }
-                                    </div>
-                                </div>
+                                    :
+                                    <div></div>
+                                }
                             </div>
                         </div>
                     </div>
