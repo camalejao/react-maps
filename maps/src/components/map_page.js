@@ -99,14 +99,14 @@ export default class Mapa extends Component {
             console.error(error);
         });
 
-        db.collection('categoria').get().then((querySnapshot) => {
+        db.collection('categoria').orderBy("id", "asc").get().then((querySnapshot) => {
             const categorias = [];
             querySnapshot.forEach((doc) => {
                 // doc.data() is never undefined for query doc snapshots
                 console.log(doc.id, " => ", doc.data());
-                const { nome } = doc.data();
+                const { id, nome } = doc.data();
                 categorias.push({
-                    key: doc.id,
+                    key: id,
                     nome: nome,
                 });
             });
@@ -223,7 +223,7 @@ export default class Mapa extends Component {
         var categorias = this.state.categorias;
         const style = {
             //width: '50rem',
-            height: '50rem',
+            height: '80vh',
             display: 'block'
         }
         if (this.state.carregado) {

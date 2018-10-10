@@ -26,10 +26,5 @@
   },
   "devDependencies": {
     "dotenv": "^6.0.0"
-  },
-  "buildpacks": [
-    {
-      "url": "https://github.com/camalejao/react-maps"
-    }
-  ]
+  }
 }
